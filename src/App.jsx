@@ -41,13 +41,26 @@ function App() {
   return (
     <>
     <h1>Progress Map Builder</h1>
-    {topics.map((topic) => (
-        <div key={topic.id}>{topic.name}
+
+    {topics.map((topic) => {
+      const total = topic.tasks.length;
+      const done = topic.tasks.filter(t => t.completed).length;
+      const percent = Math.round((done / total) * 100);
+      return (
+        <div className="topic" key={topic.id}><span>{topic.name} - {percent}%</span>
           {topic.tasks.map((task) => (
-            <div key={task.id}>{task.text}</div>
+            <div key={task.id}>
+              <input type="checkbox" 
+              checked={task.completed}
+              onChange={() => toggleTask(topic.id, task.id)}></input>
+              <span>
+                {task.text}
+              </span>
+            </div>
           ))}
         </div>
-    ))}
+      );
+    })}
     </>
   )
 }
