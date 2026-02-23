@@ -1,15 +1,21 @@
 :root {
   font-family: Arial, Helvetica, sans-serif;
+  font-size: 20px;
 }
 
 h1 {
   text-align: center;
 }
 
-.topic {
-  margin: 20px;
+input {
+  margin: 8px 0px;
 }
 
-.topic span {
+.topic {
+  margin: 30px 20px;
+}
+
+.topicText {
   font-size: 24px;
+  font-weight: bold;
 }
