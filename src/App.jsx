@@ -1,39 +1,64 @@
 import { useState } from "react";
 
-function TopicItem({ topic, toggleTask, addTask }) {
+function TopicItem({ topic, toggleTask, toggleSubtask, addTask }) {
   // To jest ten "prywatny pilot" do inputa - tylko dla TEGO tematu
-  const [taskText, setTaskText] = useState("");
+  const [taskText, setTaskText] = useState("")
 
-  const total = topic.tasks.length;
-  const done = topic.tasks.filter(t => t.completed).length;
-  const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+  const calculateProgress = (items) => {
+    if (!items || items.length === 0) return 0;
+    const completedCount = items.filter(i => i.completed).length;
+    return Math.round((completedCount / items.length) * 100); 
+  };
+
+  const topicPercent = calculateProgress(topic.tasks);
 
   return (
     <div className="topic">
-      <span className="topicText">{topic.name} - {percent}%</span>
+      <span className="topicText">{topic.name} - {topicPercent}%</span>
       
-      {topic.tasks.map((task) => (
-        <div key={task.id}>
-          <input 
-            type="checkbox" 
-            checked={task.completed}
-            onChange={() => toggleTask(topic.id, task.id)} 
-          />
-          <span>{task.text}</span>
-        </div>
-      ))}
+      {topic.tasks.map((task) => {
+        const hasSubtasks = task.subtasks && task.subtasks.length > 0;
+        const taskPercent = hasSubtasks ? calculateProgress(task.subtasks) : (task.completed ? 100 : 0);
+        
+        return (
+          <div key={task.id} className="task-group" style={{ marginLeft: '20px', marginBottom: '10px' }}>
+            <div className="main-task">
+              <input 
+                type="checkbox" 
+                checked={hasSubtasks ? taskPercent === 100 : task.completed}
+                onChange={() => toggleTask(topic.id, task.id)} 
+              />
+              {/* TUTAJ: Usunięte procenty, zostało samo pogrubione zadanie */}
+              <strong>{task.text}</strong>
+            </div>
+
+            {/* Wyświetlanie podzadań */}
+            {hasSubtasks && (
+              <div className="subtasks" style={{ marginLeft: '30px' }}>
+                {task.subtasks.map(sub => (
+                  <div key={sub.id}>
+                    <input 
+                      type="checkbox" 
+                      checked={sub.completed}
+                      onChange={() => toggleSubtask(topic.id, task.id, sub.id)}
+                    />
+                    <span>{sub.text}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })} {/* <--- Tu brakowało poprawnego domknięcia mapy i nawiasu */}
 
       <div className="add-task-section">
         <input 
           value={taskText} 
           onChange={(e) => setTaskText(e.target.value)} 
-          placeholder="Nowe zadanie"
+          placeholder="Nowe zadanie" 
         />
-        <button onClick={() => {
-          addTask(topic.id, taskText);
-          setTaskText("");
-        }}>
-          Dodaj zadanie
+        <button onClick={() => { addTask(topic.id, taskText); setTaskText(""); }}>
+          Dodaj
         </button>
       </div>
     </div>
@@ -50,7 +75,9 @@ function App() {
       id: 1, 
       name: 'Matematyka', 
       tasks: [
-        { id: 101, text: 'Funkcje', completed: false },
+        { id: 101, text: 'Funkcje', completed: false, subtasks: [
+          {id: 10101, text: 'Siema', completed: false },
+          {id: 10102, text: 'zad2', completed: false }] },
         { id: 102, text: 'Pochodne', completed: false },
         { id: 103, text: 'Ciągi', completed: false }
       ] 
@@ -66,20 +93,37 @@ function App() {
   ])
 
   //logika apk
-  const toggleTask = (topicId, taskId) => {
-    const updatedTopics = topics.map(topic => { //nowa tablica trzymajaca zaktualizowane tematy
-      if (topic.id === topicId) { //poprawnosc zmiennej
-        return {
-          ...topic, // robimy kopie tematu
-          tasks: topic.tasks.map(task => //kolejny map w srodku tematu
-            task.id === taskId ? { ...task, completed: !task.completed } : task //jesli tak to tworzymy kopie tego taska i odwracamy stan completed
-          )
-        };
-      }
-      return topic;
-    });
-    setTopics(updatedTopics);
+const toggleTask = (topicId, taskId) => {
+    setTopics(topics.map(topic => {
+      if (topic.id !== topicId) return topic;
+      return {
+        ...topic,
+        tasks: topic.tasks.map(task => {
+          if (task.id !== taskId) return task;
+          const newState = !task.completed;
+          const updatedSubtasks = task.subtasks ? task.subtasks.map(s => ({...s, completed: newState})) : [];
+          return { ...task, completed: newState, subtasks: updatedSubtasks };
+        })
+      };
+    }));
   };
+
+  const toggleSubtask = (topicId, taskId, subtaskId) => {
+    setTopics(topics.map(topic => {
+      if (topic.id !== topicId) return topic;
+      return {
+        ...topic,
+        tasks: topic.tasks.map(task => {
+          if (task.id !== taskId) return task;
+          const updatedSubtasks = task.subtasks.map(sub => 
+            sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
+          );
+          return { ...task, subtasks: updatedSubtasks };
+        })
+      };
+    }));
+  };
+  
 
   //DODAWANIE TEMATOW
 
@@ -112,27 +156,31 @@ function App() {
     setTopics(updatedTopics);
   };
 
-  return (
-    <>
-      <h1>Progress Map Builder</h1>
-      <input 
-        value={newTopicName} 
-        onChange={(e) => setNewTopicName(e.target.value)} 
-        placeholder="Nowy temat"
-      />
-      <button onClick={addTopic}>Dodaj Temat</button>
+const calculateProgress = (task) => {
+  if (!task.subtasks || task.subtasks.length === 0) {
+    return task.completed ? 100 : 0;
+  }
+  
+  const completedCount = task.subtasks.filter(st => st.completed).length;
+  return Math.round((completedCount / task.subtasks.length) * 100);
+};
 
-      {/* wywolanie komponentu */}
+return (
+    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+      <h1>Progress Map Builder</h1>
+      <input value={newTopicName} onChange={(e) => setNewTopicName(e.target.value)} placeholder="Nowy temat" />
+      <button onClick={addTopic}>Dodaj Temat</button>
 
       {topics.map((topic) => (
         <TopicItem 
           key={topic.id} 
           topic={topic} 
           toggleTask={toggleTask} 
+          toggleSubtask={toggleSubtask}
           addTask={addTask} 
         />
       ))}
-    </>
+    </div>
   );
 }
 
