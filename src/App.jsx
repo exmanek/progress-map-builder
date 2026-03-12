@@ -93,36 +93,7 @@ function App() {
   ])
 
   //logika apk
-const toggleTask = (topicId, taskId) => {
-    setTopics(topics.map(topic => {
-      if (topic.id !== topicId) return topic;
-      return {
-        ...topic,
-        tasks: topic.tasks.map(task => {
-          if (task.id !== taskId) return task;
-          const newState = !task.completed;
-          const updatedSubtasks = task.subtasks ? task.subtasks.map(s => ({...s, completed: newState})) : [];
-          return { ...task, completed: newState, subtasks: updatedSubtasks };
-        })
-      };
-    }));
-  };
-
-  const toggleSubtask = (topicId, taskId, subtaskId) => {
-    setTopics(topics.map(topic => {
-      if (topic.id !== topicId) return topic;
-      return {
-        ...topic,
-        tasks: topic.tasks.map(task => {
-          if (task.id !== taskId) return task;
-          const updatedSubtasks = task.subtasks.map(sub => 
-            sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
-          );
-          return { ...task, subtasks: updatedSubtasks };
-        })
-      };
-    }));
-  };
+  // przebudowa logiki i wywalenie stad
   
 
   //DODAWANIE TEMATOW
@@ -184,6 +155,8 @@ return (
   );
 }
 
-//test 
-
 export default App;
+
+// 1. zmienic funkcje toggle task i toggleSubtask na jedna rekurencyjna
+// 2. poprawic wyswietlanie dodaj zadanie
+// 3. dodac mozliwosc aktualizowania i usuwania zadan
