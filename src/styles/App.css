@@ -1,0 +1,127 @@
+.app-container h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #38bdf8, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* SEKCCJA DODAWANIA TEMATU */
+.add-topic-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+  justify-content: center;
+}
+
+/* KONTENER DLA TEMATÓW */
+.topics-grid {
+  display: grid;
+  gap: 25px;
+}
+
+.topic-container {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.topic-header h2 {
+  color: #38bdf8;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* REKURENCYJNY WIERSZ ZADANIA */
+.task-node {
+  margin-top: 6px;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+/* NAPRAWA HOVERA - delikatne rozjaśnienie zamiast białego gówna */
+.task-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.task-text {
+  flex: 1;
+  cursor: pointer;
+}
+
+/* UKRYWANIE PRZYCISKÓW AKCJI */
+.task-actions {
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.task-row:hover .task-actions {
+  opacity: 1;
+}
+
+/* SUBTASKI - PIONOWA LINIA DLA CZYTELNOŚCI */
+.sub-container {
+  margin-left: 22px;
+  border-left: 2px solid rgba(56, 189, 248, 0.2);
+  padding-left: 12px;
+}
+
+/* FORMULARZE I INPUTY */
+input[type="text"] {
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  outline: none;
+}
+
+input[type="text"]:focus {
+  border-color: var(--accent);
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: var(--accent-hover);
+}
+
+.task-actions button {
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.task-actions .del-btn:hover {
+  background: var(--danger);
+}
+
+/* CHECKBOX */
+input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}

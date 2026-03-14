@@ -1,162 +1,115 @@
 import { useState } from "react";
-
-function TopicItem({ topic, toggleTask, toggleSubtask, addTask }) {
-  // To jest ten "prywatny pilot" do inputa - tylko dla TEGO tematu
-  const [taskText, setTaskText] = useState("")
-
-  const calculateProgress = (items) => {
-    if (!items || items.length === 0) return 0;
-    const completedCount = items.filter(i => i.completed).length;
-    return Math.round((completedCount / items.length) * 100); 
-  };
-
-  const topicPercent = calculateProgress(topic.tasks);
-
-  return (
-    <div className="topic">
-      <span className="topicText">{topic.name} - {topicPercent}%</span>
-      
-      {topic.tasks.map((task) => {
-        const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-        const taskPercent = hasSubtasks ? calculateProgress(task.subtasks) : (task.completed ? 100 : 0);
-        
-        return (
-          <div key={task.id} className="task-group" style={{ marginLeft: '20px', marginBottom: '10px' }}>
-            <div className="main-task">
-              <input 
-                type="checkbox" 
-                checked={hasSubtasks ? taskPercent === 100 : task.completed}
-                onChange={() => toggleTask(topic.id, task.id)} 
-              />
-              {/* TUTAJ: Usunięte procenty, zostało samo pogrubione zadanie */}
-              <strong>{task.text}</strong>
-            </div>
-
-            {/* Wyświetlanie podzadań */}
-            {hasSubtasks && (
-              <div className="subtasks" style={{ marginLeft: '30px' }}>
-                {task.subtasks.map(sub => (
-                  <div key={sub.id}>
-                    <input 
-                      type="checkbox" 
-                      checked={sub.completed}
-                      onChange={() => toggleSubtask(topic.id, task.id, sub.id)}
-                    />
-                    <span>{sub.text}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })} {/* <--- Tu brakowało poprawnego domknięcia mapy i nawiasu */}
-
-      <div className="add-task-section">
-        <input 
-          value={taskText} 
-          onChange={(e) => setTaskText(e.target.value)} 
-          placeholder="Nowe zadanie" 
-        />
-        <button onClick={() => { addTask(topic.id, taskText); setTaskText(""); }}>
-          Dodaj
-        </button>
-      </div>
-    </div>
-  );
-}
+// Importujemy logikę z folderu utils
+import { updateNodeRecursive, deleteNodeRecursive, addNodeRecursive } from "./utils/taskUtils";
+// Importujemy komponenty (zakładając, że wrzuciłeś je do folderu components)
+import { TopicItem } from "./components/topicItem"; 
+import "./styles/App.css";
 
 function App() {
   const [newTopicName, setNewTopicName] = useState("");
-  const [newTaskName, setNewTaskName] = useState("");
 
-  //Dane apk
   const [topics, setTopics] = useState([
     { 
       id: 1, 
       name: 'Matematyka', 
       tasks: [
-        { id: 101, text: 'Funkcje', completed: false, subtasks: [
-          {id: 10101, text: 'Siema', completed: false },
-          {id: 10102, text: 'zad2', completed: false }] },
-        { id: 102, text: 'Pochodne', completed: false },
-        { id: 103, text: 'Ciągi', completed: false }
-      ] 
-    },
-    { 
-      id: 2, 
-      name: 'React Basics', 
-      tasks: [
-        { id: 201, text: 'useState', completed: true },
-        { id: 202, text: 'Props', completed: false }
+        { 
+          id: 101, text: 'Funkcje', completed: false, 
+          subtasks: [
+            { id: 10101, text: 'Liniowe', completed: false, subtasks: [] },
+            { id: 10102, text: 'Kwadratowe', completed: false, subtasks: [] }
+          ] 
+        },
+        { id: 102, text: 'Pochodne', completed: false, subtasks: [] }
       ] 
     }
-  ])
+  ]);
 
-  //logika apk
-  // przebudowa logiki i wywalenie stad
-  
+  // Pomocnicza funkcja, żeby nie powtarzać setTopics(topics.map(...))
+  const updateTopicsState = (topicId, transformTasksFn) => {
+    setTopics(prevTopics => prevTopics.map(topic => 
+      topic.id === topicId 
+        ? { ...topic, tasks: transformTasksFn(topic.tasks) } 
+        : topic
+    ));
+  };
 
-  //DODAWANIE TEMATOW
+  const handleToggle = (topicId, taskId) => {
+    updateTopicsState(topicId, (tasks) => 
+      updateNodeRecursive(tasks, taskId, { type: 'TOGGLE' })
+    );
+  };
 
-  const addTopic = () =>{
-    if(newTopicName.trim() === "") return
+  const handleRename = (topicId, taskId, newName) => {
+    updateTopicsState(topicId, (tasks) => 
+      updateNodeRecursive(tasks, taskId, { type: 'RENAME', newName })
+    );
+  };
 
+  const handleDelete = (topicId, taskId) => {
+    updateTopicsState(topicId, (tasks) => 
+      deleteNodeRecursive(tasks, taskId)
+    );
+  };
+
+  const handleAddSubtask = (topicId, parentId, text) => {
+    if (!text.trim()) return;
+    updateTopicsState(topicId, (tasks) => 
+      addNodeRecursive(tasks, parentId, text)
+    );
+  };
+
+  const addTopic = () => {
+    if (!newTopicName.trim()) return;
     const newTopic = {
       id: Date.now(),
       name: newTopicName,
       tasks: []
-    }
-
-    setTopics([...topics, newTopic])
-    setNewTopicName("")
-  }
-
-  //DODAWANIE TASKOW
-
-  const addTask = (topicId, text) => {
-    if (text.trim() === "") return;
-    const updatedTopics = topics.map(topic => {
-      if (topic.id === topicId) {
-        return { 
-          ...topic, 
-          tasks: [...topic.tasks, { id: Date.now(), text: text, completed: false }] 
-        };
-      }
-      return topic;
-    });
-    setTopics(updatedTopics);
+    };
+    setTopics([...topics, newTopic]);
+    setNewTopicName("");
   };
 
-const calculateProgress = (task) => {
-  if (!task.subtasks || task.subtasks.length === 0) {
-    return task.completed ? 100 : 0;
-  }
-  
-  const completedCount = task.subtasks.filter(st => st.completed).length;
-  return Math.round((completedCount / task.subtasks.length) * 100);
-};
+  const addMainTask = (topicId, text) => {
+    if (!text.trim()) return;
+    setTopics(topics.map(topic => 
+      topic.id === topicId 
+        ? { ...topic, tasks: [...topic.tasks, { id: Date.now(), text, completed: false, subtasks: [] }] }
+        : topic
+    ));
+  };
 
-return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+  return (
+    <div className="app-container">
       <h1>Progress Map Builder</h1>
-      <input value={newTopicName} onChange={(e) => setNewTopicName(e.target.value)} placeholder="Nowy temat" />
-      <button onClick={addTopic}>Dodaj Temat</button>
-
-      {topics.map((topic) => (
-        <TopicItem 
-          key={topic.id} 
-          topic={topic} 
-          toggleTask={toggleTask} 
-          toggleSubtask={toggleSubtask}
-          addTask={addTask} 
+      
+      <div className="add-topic-section">
+        <input 
+          value={newTopicName} 
+          onChange={(e) => setNewTopicName(e.target.value)} 
+          placeholder="Nowy temat (np. Biologia)" 
         />
-      ))}
+        <button onClick={addTopic}>Dodaj Temat</button>
+      </div>
+
+      <div className="topics-grid">
+        {topics.map((topic) => (
+          <TopicItem 
+            key={topic.id} 
+            topic={topic} 
+            onToggle={handleToggle}
+            onDelete={handleDelete}
+            onRename={handleRename}
+            onAddSubtask={handleAddSubtask}
+            addTask={addMainTask} 
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
 export default App;
 
-// 1. zmienic funkcje toggle task i toggleSubtask na jedna rekurencyjna
-// 2. poprawic wyswietlanie dodaj zadanie
-// 3. dodac mozliwosc aktualizowania i usuwania zadan
+// poprawic liczenie procentow
+// dodac opis albo zakladke info

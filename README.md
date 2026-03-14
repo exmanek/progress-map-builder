@@ -1,16 +1,50 @@
-# React + Vite
+# Progress Map Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Progress Map Builder is a simple React application that helps organize and visualize progress in learning, projects, or any structured work.
 
-Currently, two official plugins are available:
+The main idea is to break large goals into smaller **topics, tasks, and subtasks**, making it easier to track progress and manage work.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- Create multiple **topics** (e.g. Mathematics, Programming, Biology)
+- Add **tasks** inside each topic
+- Create **nested subtasks**
+- Mark tasks as **completed**
+- Rename tasks
+- Delete tasks
+- Tree-based task structure using **recursive functions**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## How It Works
 
-## Expanding the ESLint configuration
+Each topic contains a list of tasks.  
+Each task can contain **subtasks**, which can also contain their own subtasks, forming a hierarchical tree structure.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Operations such as:
+
+- toggling completion
+- renaming tasks
+- deleting tasks
+- adding subtasks
+
+are handled by recursive utility functions located in:
+
+`utils/taskUtils.js`
+
+## Tech Stack
+
+- React
+- JavaScript
+- CSS
+
+## Planned Improvements
+
+- Fix progress percentage calculation
+- Add information/help section
+- Improve UI and visualization
+
+## Example Use Cases
+
+- Learning roadmap
+- Study planning
+- Project breakdown
+- Skill progression tracking
