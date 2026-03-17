@@ -1,7 +1,7 @@
 import { useState } from "react";
-// Importujemy logikę z folderu utils
+
 import { updateNodeRecursive, deleteNodeRecursive, addNodeRecursive } from "./utils/taskUtils";
-// Importujemy komponenty (zakładając, że wrzuciłeś je do folderu components)
+
 import { TopicItem } from "./components/topicItem"; 
 import "./styles/App.css";
 
@@ -13,7 +13,7 @@ function App() {
       id: 1, 
       name: 'Matematyka', 
       tasks: [
-        { 
+        {
           id: 101, text: 'Funkcje', completed: false, 
           subtasks: [
             { id: 10101, text: 'Liniowe', completed: false, subtasks: [] },
@@ -25,7 +25,6 @@ function App() {
     }
   ]);
 
-  // Pomocnicza funkcja, żeby nie powtarzać setTopics(topics.map(...))
   const updateTopicsState = (topicId, transformTasksFn) => {
     setTopics(prevTopics => prevTopics.map(topic => 
       topic.id === topicId 
@@ -81,7 +80,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Progress Map Builder</h1>
+      <h1>Task Manager</h1>
       
       <div className="add-topic-section">
         <input 
