@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { TaskItem } from "./taskItem";
 
-export function TopicItem({ topic, onToggle, onDelete, onRename, onAddSubtask, addTask }) {
+export function TopicItem({ topic, onToggle, onDelete, onRename, onAddSubtask, addTask, onRemoveTopic, onRenameTopic }) {
   const [taskText, setTaskText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
-  // Funkcja progresu liczy teraz wszystko w głąb (rekurencyjnie)
   const calculateDeepProgress = (items) => {
     if (!items || items.length === 0) return 0;
     const total = items.length;
@@ -22,7 +22,36 @@ export function TopicItem({ topic, onToggle, onDelete, onRename, onAddSubtask, a
   return (
     <div className="topic-container">
       <div className="topic-header">
-        <h2>{topic.name} <span className="badge">{progress}%</span></h2>
+        {isEditing ? (
+          <input 
+            autoFocus
+            className="topic-rename-input"
+            value={topic.name}
+            onChange={(e) => onRenameTopic(topic.id, e.target.value)}
+            onBlur={() => setIsEditing(false)}
+            onKeyDown={(e) => e.key === 'Enter' && setIsEditing(false)}
+          />
+        ) : (
+          <h2 onDoubleClick={() => setIsEditing(true)}>
+            {topic.name} 
+            <div className="topic-actions">
+              <span className={`badge ${progress === 100 ? 'completed' : ''}`}>{progress}%</span>
+              <button
+                className="remove-topic-btn" 
+                onClick={() => {
+                  const confirmDelete = window.confirm(`Czy napewno chcesz usunąć temat "${topic.name}"?`)
+
+                  if(confirmDelete){
+                    onRemoveTopic(topic.id)
+                  }
+                }}
+                title="Usuń cały temat"
+              >
+                ×
+              </button>
+            </div>
+          </h2>
+        )}
       </div>
       
       <div className="tasks-list">

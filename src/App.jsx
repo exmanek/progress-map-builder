@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { updateNodeRecursive, deleteNodeRecursive, addNodeRecursive } from "./utils/taskUtils";
 
@@ -8,22 +8,31 @@ import "./styles/App.css";
 function App() {
   const [newTopicName, setNewTopicName] = useState("");
 
-  const [topics, setTopics] = useState([
-    { 
-      id: 1, 
-      name: 'Matematyka', 
-      tasks: [
-        {
-          id: 101, text: 'Funkcje', completed: false, 
-          subtasks: [
-            { id: 10101, text: 'Liniowe', completed: false, subtasks: [] },
-            { id: 10102, text: 'Kwadratowe', completed: false, subtasks: [] }
-          ] 
-        },
-        { id: 102, text: 'Pochodne', completed: false, subtasks: [] }
-      ] 
-    }
-  ]);
+  // const [topics, setTopics] = useState([
+  //   { 
+  //     id: 1, 
+  //     name: 'Matematyka', 
+  //     tasks: [
+  //       {
+  //         id: 101, text: 'Funkcje', completed: false, 
+  //         subtasks: [
+  //           { id: 10101, text: 'Liniowe', completed: false, subtasks: [] },
+  //           { id: 10102, text: 'Kwadratowe', completed: false, subtasks: [] }
+  //         ] 
+  //       },
+  //       { id: 102, text: 'Pochodne', completed: false, subtasks: [] }
+  //     ] 
+  //   }
+  // ]);
+
+  const [topics, setTopics] = useState(() => {
+    const saved = localStorage.getItem("tasks-data")
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("tasks-data", JSON.stringify(topics))
+  }, [topics])
 
   const updateTopicsState = (topicId, transformTasksFn) => {
     setTopics(prevTopics => prevTopics.map(topic => 
@@ -58,6 +67,8 @@ function App() {
     );
   };
 
+  // logika tematow
+
   const addTopic = () => {
     if (!newTopicName.trim()) return;
     const newTopic = {
@@ -68,6 +79,16 @@ function App() {
     setTopics([...topics, newTopic]);
     setNewTopicName("");
   };
+
+const removeTopic = (topicId) => {
+  setTopics(prev => prev.filter(t => t.id !== topicId));
+};
+
+const renameTopic = (topicId, newName) => {
+  setTopics(prev => prev.map(t => 
+    t.id === topicId ? { ...t, name: newName } : t
+  ));
+};
 
   const addMainTask = (topicId, text) => {
     if (!text.trim()) return;
@@ -86,7 +107,7 @@ function App() {
         <input 
           value={newTopicName} 
           onChange={(e) => setNewTopicName(e.target.value)} 
-          placeholder="Nowy temat (np. Biologia)" 
+          placeholder="Nowy temat" 
         />
         <button onClick={addTopic}>Dodaj Temat</button>
       </div>
@@ -101,6 +122,8 @@ function App() {
             onRename={handleRename}
             onAddSubtask={handleAddSubtask}
             addTask={addMainTask} 
+            onRemoveTopic={removeTopic}
+            onRenameTopic={renameTopic}
           />
         ))}
       </div>
@@ -112,3 +135,6 @@ export default App;
 
 // poprawic liczenie procentow
 // dodac opis albo zakladke info
+// dodac zapisywanie w localstorage
+// Drag & Drop (Przeciąganie zadań)
+// System "Priorytetów" i "Tagów"

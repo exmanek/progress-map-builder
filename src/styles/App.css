@@ -110,11 +110,15 @@ button:hover {
 }
 
 .task-actions button {
-  padding: 2px 8px;
+  padding: 4px 8px;
   background: rgba(255, 255, 255, 0.1);
 }
 
-.task-actions .del-btn:hover {
+.add-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.del-btn:hover {
   background: var(--danger);
 }
 
@@ -124,4 +128,51 @@ input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
+}
+
+.topic-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.remove-topic-btn {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+  transition: all 0.2s ease-in-out;
+  
+  background: rgba(239, 68, 68, 0.1); /* Delikatny czerwony */
+  color: #ef4444;
+  border: 2px solid rgba(239, 68, 68, 0.2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.topic-header h2:hover .remove-topic-btn {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.remove-topic-btn:hover {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+.badge {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease; 
+}
+
+.badge.completed {
+  background: rgba(16, 185, 129, 0.2); /* Przezroczysty zielony */
+  color: var(--success, #10b981);      /* Zielony tekst */
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); /* Delikatna poświata */
 }

@@ -30,7 +30,7 @@ export function TaskItem({ task, topicId, onToggle, onDelete, onRename, onAddSub
         )}
 
         <div className="task-actions">
-          <button onClick={() => setShowInput(!showInput)}>+</button>
+          <button onClick={() => setShowInput(!showInput)} className="add-btn">+</button>
           <button className="del-btn" onClick={() => onDelete(topicId, task.id)}>×</button>
         </div>
       </div>
@@ -42,6 +42,13 @@ export function TaskItem({ task, topicId, onToggle, onDelete, onRename, onAddSub
             value={newText} 
             onChange={(e) => setNewText(e.target.value)} 
             placeholder="Dodaj podpunkt..."
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                onAddSubtask(topicId, task.id, newText);
+                setNewText("");
+                setShowInput(false);
+              }
+            }}
           />
           <button onClick={() => { onAddSubtask(topicId, task.id, newText); setNewText(""); setShowInput(false); }}>
             Dodaj

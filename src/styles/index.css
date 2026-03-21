@@ -1,11 +1,21 @@
 :root {
+  /* Podstawa */
   --bg-dark: #0f172a;
   --bg-card: #1e293b;
   --accent: #6366f1;
   --accent-hover: #818cf8;
   --text-main: #f1f5f9;
   --text-muted: #94a3b8;
-  --danger: #ef4444;
+
+  /* Statusy */
+  --danger: #ef4444;    /* Czerwony (Błędy, Usuwanie) */
+  --success: #22c55e;   /* Zielony (Ukończone zadania, 100%) */
+  --warning: #f59e0b;   /* Żółty/Bursztynowy (Ostrzeżenia, Priorytet) */
+  --info: #3b82f6;      /* Niebieski (Informacje, Podpowiedzi) */
+  
+  /* Wersje "soft" (np. do tła powiadomień lub subtelnych ramek) */
+  --success-soft: rgba(34, 197, 94, 0.1);
+  --warning-soft: rgba(245, 158, 11, 0.1);
 }
 
 * {
